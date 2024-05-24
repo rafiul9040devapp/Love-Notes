@@ -8,7 +8,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
@@ -18,9 +17,9 @@ import com.rafiul.lovenotes.MainActivity
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentEditNoteBinding
 import com.rafiul.lovenotes.model.Note
-import com.rafiul.lovenotes.utils.DialogueExtension.showAlertDialog
-import com.rafiul.lovenotes.utils.DialogueExtension.showToast
 import com.rafiul.lovenotes.utils.runWithProgressBar
+import com.rafiul.lovenotes.utils.showAlertDialog
+import com.rafiul.lovenotes.utils.showToast
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
 
 
@@ -74,13 +73,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
                 if (noteTitle.isNotEmpty()) {
                     val note = Note(currentNote.id, noteTitle, noteDescription)
                     noteViewModel.updateNote(note)
-
-                    with(view){
-                        runWithProgressBar(3000){
-                            findNavController().popBackStack(R.id.homeFragment, false)
-                        }
-                    }
-
+                    navigateToHomeScreen(view)
                 } else {
                     context?.showToast(getString(R.string.please_enter_note_title))
                 }
@@ -96,11 +89,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
             positiveAction = {
                 noteViewModel.deleteNote(currentNote)
                 context?.showToast(getString(R.string.note_deleted))
-                with(view){
-                    runWithProgressBar(3000){
-                        findNavController().popBackStack(R.id.homeFragment, false)
-                    }
-                }
+                navigateToHomeScreen(view)
             },
             negativeButtonText = getString(R.string.cancel)
         )
@@ -122,6 +111,14 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
 //            }
 //            setNegativeButton(getString(R.string.cancel), null)
 //        }.create().show()
+    }
+
+    private fun navigateToHomeScreen(view: View) {
+        with(view) {
+            runWithProgressBar(3000) {
+                findNavController().popBackStack(R.id.homeFragment, false)
+            }
+        }
     }
 
 

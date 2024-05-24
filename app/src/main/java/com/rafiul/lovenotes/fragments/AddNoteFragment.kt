@@ -16,8 +16,8 @@ import com.rafiul.lovenotes.MainActivity
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentAddNoteBinding
 import com.rafiul.lovenotes.model.Note
-import com.rafiul.lovenotes.utils.DialogueExtension.showToast
 import com.rafiul.lovenotes.utils.runWithProgressBar
+import com.rafiul.lovenotes.utils.showToast
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
 
 

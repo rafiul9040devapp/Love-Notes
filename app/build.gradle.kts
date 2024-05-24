@@ -75,4 +75,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     // Annotation processor
     ksp("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
+    
+    //Spinkit Progressbar
+    implementation("com.github.ybq:Android-SpinKit:1.4.0")
 }
