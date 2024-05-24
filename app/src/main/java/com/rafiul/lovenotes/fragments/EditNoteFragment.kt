@@ -20,6 +20,7 @@ import com.rafiul.lovenotes.databinding.FragmentEditNoteBinding
 import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.utils.DialogueExtension.showAlertDialog
 import com.rafiul.lovenotes.utils.DialogueExtension.showToast
+import com.rafiul.lovenotes.utils.runWithProgressBar
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
 
 
@@ -73,7 +74,13 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
                 if (noteTitle.isNotEmpty()) {
                     val note = Note(currentNote.id, noteTitle, noteDescription)
                     noteViewModel.updateNote(note)
-                    view.findNavController().popBackStack(R.id.homeFragment, false)
+
+                    with(view){
+                        runWithProgressBar(3000){
+                            findNavController().popBackStack(R.id.homeFragment, false)
+                        }
+                    }
+
                 } else {
                     context?.showToast(getString(R.string.please_enter_note_title))
                 }
@@ -89,7 +96,11 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
             positiveAction = {
                 noteViewModel.deleteNote(currentNote)
                 context?.showToast(getString(R.string.note_deleted))
-                view.findNavController().popBackStack(R.id.homeFragment, false)
+                with(view){
+                    runWithProgressBar(3000){
+                        findNavController().popBackStack(R.id.homeFragment, false)
+                    }
+                }
             },
             negativeButtonText = getString(R.string.cancel)
         )

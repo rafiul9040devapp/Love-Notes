@@ -57,8 +57,10 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
             noteViewModel.insertNote(note)
             addNoteView.context?.showToast(getString(R.string.note_saved))
 
-            view.runWithProgressBar(3000) {
-                view.findNavController().popBackStack(R.id.homeFragment, false)
+            with(view){
+                runWithProgressBar(3000){
+                    findNavController().popBackStack(R.id.homeFragment, false)
+                }
             }
 
         } else {
