@@ -8,7 +8,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
@@ -17,13 +16,15 @@ import com.rafiul.lovenotes.MainActivity
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentAddNoteBinding
 import com.rafiul.lovenotes.model.Note
+import com.rafiul.lovenotes.utils.DialogueExtension.showToast
+import com.rafiul.lovenotes.utils.runWithProgressBar
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
 
 
 class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
     private var addNoteBinding: FragmentAddNoteBinding? = null
-    private val binding  get() = addNoteBinding!!
+    private val binding get() = addNoteBinding!!
 
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var addNoteView: View
@@ -32,7 +33,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        addNoteBinding = FragmentAddNoteBinding.inflate(inflater, container,false)
+        addNoteBinding = FragmentAddNoteBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -47,33 +48,36 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
     }
 
-    private fun saveNote(view: View){
+    private fun saveNote(view: View) {
         val noteTitle = binding.addNoteTitle.text.toString().trim()
         val noteDescription = binding.addNoteDesc.text.toString().trim()
 
-        if (noteTitle.isNotEmpty()){
-            val note = Note(0,noteTitle,noteDescription)
+        if (noteTitle.isNotEmpty()) {
+            val note = Note(0, noteTitle, noteDescription)
             noteViewModel.insertNote(note)
+            addNoteView.context?.showToast(getString(R.string.note_saved))
 
-            Toast.makeText(addNoteView.context, getString(R.string.note_saved), Toast.LENGTH_SHORT).show()
-            view.findNavController().popBackStack(R.id.homeFragment,false)
-        }else{
-            Toast.makeText(addNoteView.context,
-                getString(R.string.please_enter_note_title), Toast.LENGTH_SHORT).show()
+            view.runWithProgressBar(3000) {
+                view.findNavController().popBackStack(R.id.homeFragment, false)
+            }
+
+        } else {
+            addNoteView.context?.showToast(getString(R.string.please_enter_note_title))
         }
     }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menu.clear()
-        menuInflater.inflate(R.menu.add_note_menu,menu)
+        menuInflater.inflate(R.menu.add_note_menu, menu)
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        return when(menuItem.itemId){
-            R.id.saveMenu ->{
+        return when (menuItem.itemId) {
+            R.id.saveMenu -> {
                 saveNote(addNoteView)
                 true
             }
+
             else -> false
         }
     }

@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -19,6 +20,8 @@ import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.adapter.NoteAdapter
 import com.rafiul.lovenotes.databinding.FragmentHomeBinding
 import com.rafiul.lovenotes.model.Note
+import com.rafiul.lovenotes.utils.DialogueExtension.showAlertDialog
+import com.rafiul.lovenotes.utils.ViewExtension.toggleVisibility
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
 
 
@@ -57,6 +60,28 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showExitDialogue()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+    }
+
+    private fun showExitDialogue() {
+        context?.showAlertDialog(
+            title = getString(R.string.exit),
+            message = getString(R.string.are_you_sure_want_to_exit),
+            positiveButtonText = getString(R.string.ok),
+            positiveAction = {
+                requireActivity().finish()
+            },
+            negativeButtonText = getString(R.string.cancel)
+        )
+    }
+
 
 //    private fun updateTheUI(note: List<Note>?) {
 //        if (note != null) {
@@ -75,17 +100,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 //    }
 
 
-    //going to use this in the utils 
-    private fun View.toggleVisibility(isVisible: Boolean) {
-        this.visibility = if (isVisible) View.VISIBLE else View.GONE
-    }
+
 
     private fun updateTheUI(notes: List<Note>?) {
         notes?.let {
             val hasNotes = it.isNotEmpty()
-//            binding.emptyNotesImage.toggleVisibility(!hasNotes)
-//            binding.homeRecyclerView.toggleVisibility(hasNotes)
-
             with(binding) {
                 emptyNotesImage.toggleVisibility(!hasNotes)
                 homeRecyclerView.toggleVisibility(hasNotes)

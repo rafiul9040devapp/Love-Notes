@@ -18,6 +18,8 @@ import com.rafiul.lovenotes.MainActivity
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentEditNoteBinding
 import com.rafiul.lovenotes.model.Note
+import com.rafiul.lovenotes.utils.DialogueExtension.showAlertDialog
+import com.rafiul.lovenotes.utils.DialogueExtension.showToast
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
 
 
@@ -73,33 +75,42 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
                     noteViewModel.updateNote(note)
                     view.findNavController().popBackStack(R.id.homeFragment, false)
                 } else {
-                    Toast.makeText(
-                        context,
-                        getText(R.string.please_enter_note_title),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    context?.showToast(getString(R.string.please_enter_note_title))
                 }
             }
         }
     }
 
     private fun deleteNote(view: View) {
-        android.app.AlertDialog.Builder(activity).apply {
-            setTitle(getString(R.string.delete_note))
-            setMessage(getString(R.string.do_you_want_to_delete_this_note))
-            setPositiveButton(getString(R.string.delete)) { _, _ ->
+        context?.showAlertDialog(
+            title = getString(R.string.delete_note),
+            message = getString(R.string.do_you_want_to_delete_this_note),
+            positiveButtonText = getString(R.string.delete),
+            positiveAction = {
                 noteViewModel.deleteNote(currentNote)
-                Toast.makeText(
-                    context,
-                    getString(R.string.note_deleted),
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                //handler looper for nice experience
+                context?.showToast(getString(R.string.note_deleted))
                 view.findNavController().popBackStack(R.id.homeFragment, false)
-            }
-            setNegativeButton(getString(R.string.cancel), null)
-        }.create().show()
+            },
+            negativeButtonText = getString(R.string.cancel)
+        )
+
+
+//        android.app.AlertDialog.Builder(activity).apply {
+//            setTitle(getString(R.string.delete_note))
+//            setMessage(getString(R.string.do_you_want_to_delete_this_note))
+//            setPositiveButton(getString(R.string.delete)) { _, _ ->
+//                noteViewModel.deleteNote(currentNote)
+//                Toast.makeText(
+//                    context,
+//                    getString(R.string.note_deleted),
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//
+//                //handler looper for nice experience
+//                view.findNavController().popBackStack(R.id.homeFragment, false)
+//            }
+//            setNegativeButton(getString(R.string.cancel), null)
+//        }.create().show()
     }
 
 
