@@ -1,30 +1,36 @@
 package com.rafiul.lovenotes
 
-import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
-import com.rafiul.lovenotes.database.NoteDatabase
-import com.rafiul.lovenotes.repository.NoteRepository
-import com.rafiul.lovenotes.viewmodel.NoteViewModel
-import com.rafiul.lovenotes.viewmodel.NoteViewModelFactory
 
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    lateinit var noteViewModel: NoteViewModel
+
+    private lateinit var navController: NavController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setUpViewModel()
+
+        // Find the NavHostFragment using its ID
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+
+        // Get the NavController
+        navController = navHostFragment.navController
+
+        // Set up the action bar with NavController
+        setupActionBarWithNavController(navController)
     }
 
-
-    private fun setUpViewModel() {
-        val noteRepository = NoteRepository(NoteDatabase(this))
-        val viewModelProviderFactory = NoteViewModelFactory(application, noteRepository)
-        noteViewModel = ViewModelProvider(this, viewModelProviderFactory)[NoteViewModel::class.java]
+    override fun onSupportNavigateUp(): Boolean {
+        // Navigate up with the NavController when the up button is pressed
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

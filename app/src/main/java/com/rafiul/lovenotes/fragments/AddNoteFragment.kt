@@ -10,8 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.rafiul.lovenotes.MainActivity
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentAddNoteBinding
@@ -19,14 +21,17 @@ import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.utils.runWithProgressBar
 import com.rafiul.lovenotes.utils.showToast
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
+import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
     private var addNoteBinding: FragmentAddNoteBinding? = null
     private val binding get() = addNoteBinding!!
 
-    private lateinit var noteViewModel: NoteViewModel
+   private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
     private lateinit var addNoteView: View
 
     override fun onCreateView(
@@ -42,8 +47,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
-        noteViewModel = (activity as MainActivity).noteViewModel
         addNoteView = view
 
     }
@@ -54,14 +57,16 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
         if (noteTitle.isNotEmpty()) {
             val note = Note(0, noteTitle, noteDescription)
-            noteViewModel.insertNote(note)
+            noteViewModelAlternative.insertNote(note)
             addNoteView.context?.showToast(getString(R.string.note_saved))
 
-            with(view){
-                runWithProgressBar(3000){
-                    findNavController().popBackStack(R.id.homeFragment, false)
-                }
-            }
+            findNavController().popBackStack()
+
+//            with(view){
+//                runWithProgressBar(3000){
+//                    findNavController().popBackStack()
+//                }
+//            }
 
         } else {
             addNoteView.context?.showToast(getString(R.string.please_enter_note_title))

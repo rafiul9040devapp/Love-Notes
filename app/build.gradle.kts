@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("dagger.hilt.android.plugin")
+    kotlin("kapt")
     id ("kotlin-kapt")
     id ("kotlin-parcelize")
     id("com.google.devtools.ksp")
@@ -56,6 +58,10 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
 
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+
     // ROOM
     val roomVersion = "2.6.1"
     implementation ("androidx.room:room-runtime:$roomVersion")
@@ -75,7 +81,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     // Annotation processor
     ksp("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
-    
-    //Spinkit Progressbar
-    implementation("com.github.ybq:Android-SpinKit:1.4.0")
+
+}
+
+
+kapt {
+    correctErrorTypes = true
 }

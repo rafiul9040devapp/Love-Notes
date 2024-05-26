@@ -10,25 +10,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.rafiul.lovenotes.MainActivity
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentEditNoteBinding
 import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.utils.runWithProgressBar
 import com.rafiul.lovenotes.utils.showAlertDialog
 import com.rafiul.lovenotes.utils.showToast
-import com.rafiul.lovenotes.viewmodel.NoteViewModel
+import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
+import dagger.hilt.android.AndroidEntryPoint
 
 
-class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
+@AndroidEntryPoint
+class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
 
     private var editNoteBinding: FragmentEditNoteBinding? = null
     private val binding get() = editNoteBinding!!
 
-    private lateinit var noteViewModel: NoteViewModel
+    private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
 
     private lateinit var currentNote: Note
     private val args: EditNoteFragmentArgs by navArgs()
@@ -48,8 +51,6 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
-        noteViewModel = (activity as MainActivity).noteViewModel
 
         currentNote = args.note!!
 
@@ -72,7 +73,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
 
                 if (noteTitle.isNotEmpty()) {
                     val note = Note(currentNote.id, noteTitle, noteDescription)
-                    noteViewModel.updateNote(note)
+                    noteViewModelAlternative.updateNote(note)
                     navigateToHomeScreen(view)
                 } else {
                     context?.showToast(getString(R.string.please_enter_note_title))
@@ -87,38 +88,27 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
             message = getString(R.string.do_you_want_to_delete_this_note),
             positiveButtonText = getString(R.string.delete),
             positiveAction = {
-                noteViewModel.deleteNote(currentNote)
+                noteViewModelAlternative.deleteNote(currentNote)
                 context?.showToast(getString(R.string.note_deleted))
                 navigateToHomeScreen(view)
             },
             negativeButtonText = getString(R.string.cancel)
         )
 
-
-//        android.app.AlertDialog.Builder(activity).apply {
-//            setTitle(getString(R.string.delete_note))
-//            setMessage(getString(R.string.do_you_want_to_delete_this_note))
-//            setPositiveButton(getString(R.string.delete)) { _, _ ->
-//                noteViewModel.deleteNote(currentNote)
-//                Toast.makeText(
-//                    context,
-//                    getString(R.string.note_deleted),
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//
-//                //handler looper for nice experience
-//                view.findNavController().popBackStack(R.id.homeFragment, false)
-//            }
-//            setNegativeButton(getString(R.string.cancel), null)
-//        }.create().show()
     }
 
     private fun navigateToHomeScreen(view: View) {
-        with(view) {
-            runWithProgressBar(3000) {
-                findNavController().popBackStack(R.id.homeFragment, false)
-            }
-        }
+//        with(view) {
+//            runWithProgressBar(3000) {
+//                findNavController().popBackStack()
+//            }
+//        }
+
+        findNavController().popBackStack(R.id.homeFragment,false)
+
+//        view.runWithProgressBar(1500){
+//            findNavController().navigate(R.id.action_editNoteFragment_to_homeFragment)
+//        }
     }
 
 
