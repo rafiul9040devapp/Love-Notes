@@ -20,9 +20,15 @@ import com.rafiul.lovenotes.databinding.FragmentAddNoteBinding
 import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.utils.runWithProgressBar
 import com.rafiul.lovenotes.utils.showToast
+import com.rafiul.lovenotes.utils.toggleVisibility
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
 import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @AndroidEntryPoint
@@ -31,8 +37,10 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
     private var addNoteBinding: FragmentAddNoteBinding? = null
     private val binding get() = addNoteBinding!!
 
-   private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
+    private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
     private lateinit var addNoteView: View
+
+    val inProgress = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,9 +66,13 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
         if (noteTitle.isNotEmpty()) {
             val note = Note(0, noteTitle, noteDescription)
             noteViewModelAlternative.insertNote(note)
+
             addNoteView.context?.showToast(getString(R.string.note_saved))
 
             findNavController().popBackStack()
+
+           // navigationHandling()
+
 
 //            with(view){
 //                runWithProgressBar(3000){
@@ -70,6 +82,22 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
         } else {
             addNoteView.context?.showToast(getString(R.string.please_enter_note_title))
+        }
+    }
+
+    private fun navigationHandling() {
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(1500L)
+            withContext(Dispatchers.Main) {
+                binding.progressBar.toggleVisibility(!inProgress)
+            }
+
+            binding.progressBar.toggleVisibility(inProgress)
+            addNoteView.context?.showToast(getString(R.string.note_saved))
+
+            withContext(Dispatchers.Main) {
+                findNavController().popBackStack()
+            }
         }
     }
 
