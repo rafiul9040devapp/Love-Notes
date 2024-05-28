@@ -1,6 +1,8 @@
 package com.rafiul.lovenotes.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -12,15 +14,14 @@ import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentEditNoteBinding
 import com.rafiul.lovenotes.model.Note
-import com.rafiul.lovenotes.utils.runWithProgressBar
 import com.rafiul.lovenotes.utils.showAlertDialog
 import com.rafiul.lovenotes.utils.showToast
+import com.rafiul.lovenotes.utils.toggleVisibility
 import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -28,21 +29,22 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
 
-    private var editNoteBinding: FragmentEditNoteBinding? = null
-    private val binding get() = editNoteBinding!!
+    private lateinit var binding: FragmentEditNoteBinding
 
     private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
 
     private lateinit var currentNote: Note
     private val args: EditNoteFragmentArgs by navArgs()
 
-    private lateinit var editNoteView: View
+    private lateinit var deleteMenuItem: MenuItem
+    private val inProgress = false
+    private val EXECUTION_TIME: Long = 2500L
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        editNoteBinding = FragmentEditNoteBinding.inflate(inflater, container, false)
+        binding = FragmentEditNoteBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -54,18 +56,16 @@ class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
 
         currentNote = args.note!!
 
-        editNoteView = view
-
         with(binding) {
             editNoteTitle.setText(currentNote.noteTitle)
             editNoteDesc.setText(currentNote.noteDescription)
         }
 
-        updateNote(editNoteView)
+        updateNote()
     }
 
 
-    private fun updateNote(view: View) {
+    private fun updateNote() {
         with(binding) {
             editNoteFab.setOnClickListener {
                 val noteTitle = editNoteTitle.text.toString().trim()
@@ -74,7 +74,10 @@ class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
                 if (noteTitle.isNotEmpty()) {
                     val note = Note(currentNote.id, noteTitle, noteDescription)
                     noteViewModelAlternative.updateNote(note)
-                    navigateToHomeScreen(view)
+                    deleteMenuItem.isEnabled = false
+                    navigateToHomeScreen{
+                        context?.showToast(getString(R.string.note_is_updated))
+                    }
                 } else {
                     context?.showToast(getString(R.string.please_enter_note_title))
                 }
@@ -82,55 +85,49 @@ class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
         }
     }
 
-    private fun deleteNote(view: View) {
+    private fun deleteNote() {
         context?.showAlertDialog(
             title = getString(R.string.delete_note),
             message = getString(R.string.do_you_want_to_delete_this_note),
             positiveButtonText = getString(R.string.delete),
             positiveAction = {
                 noteViewModelAlternative.deleteNote(currentNote)
-                context?.showToast(getString(R.string.note_deleted))
-                navigateToHomeScreen(view)
+                navigateToHomeScreen{
+                    context?.showToast(getString(R.string.note_deleted))
+                }
             },
             negativeButtonText = getString(R.string.cancel)
         )
 
     }
 
-    private fun navigateToHomeScreen(view: View) {
-//        with(view) {
-//            runWithProgressBar(3000) {
-//                findNavController().popBackStack()
-//            }
-//        }
+    private fun navigateToHomeScreen(action: () -> Unit) {
+        deleteMenuItem.isEnabled = false
 
-        findNavController().popBackStack(R.id.homeFragment,false)
-
-//        view.runWithProgressBar(1500){
-//            findNavController().navigate(R.id.action_editNoteFragment_to_homeFragment)
-//        }
+        with(binding){
+            main.toggleVisibility(inProgress)
+            progressOverlay.srcOver.toggleVisibility(!inProgress)
+        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            action()
+            findNavController().popBackStack(R.id.homeFragment,false)
+        },EXECUTION_TIME)
     }
 
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menu.clear()
         menuInflater.inflate(R.menu.edit_note_menu, menu)
+        deleteMenuItem = menu.findItem(R.id.deleteMenu)
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.deleteMenu -> {
-                deleteNote(editNoteView)
+                deleteNote()
                 true
             }
-
             else -> false
         }
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        editNoteBinding = null
     }
 }

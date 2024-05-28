@@ -38,9 +38,7 @@ class NoteAdapterAlternative(private var listener: Listener) :
         )
     }
 
-    override fun onBindViewHolder(holder: NoteViewHolderAlternative, position: Int) =
-        holder.bind(getItem(position))
-
+    override fun onBindViewHolder(holder: NoteViewHolderAlternative, position: Int) = holder.bind(getItem(position))
 
     companion object {
         val COMPARATOR = object : DiffUtil.ItemCallback<Note>() {

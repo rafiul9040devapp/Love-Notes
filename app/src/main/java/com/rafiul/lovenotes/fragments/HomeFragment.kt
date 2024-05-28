@@ -28,12 +28,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextListener,
-    MenuProvider,NoteAdapterAlternative.Listener {
+class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextListener, MenuProvider {
 
-
-    private var homeBinding: FragmentHomeBinding? = null
-    private val binding get() = homeBinding!!
+    private lateinit var binding: FragmentHomeBinding
 
     private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
 
@@ -43,7 +40,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        homeBinding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -54,32 +51,35 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-
-
         with(binding) {
             addNoteFab.setOnClickListener {
                 findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
             }
         }
 
+        settingUpRecyclerView()
+    }
 
-        noteAdapterAlternative = NoteAdapterAlternative(this)
+    private fun settingUpRecyclerView() {
+        noteAdapterAlternative = NoteAdapterAlternative(object : NoteAdapterAlternative.Listener {
+            override fun showDetailsOfNote(note: Note) {
+                val direction: NavDirections =
+                    HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(note)
+                findNavController().navigate(direction)
+            }
+        })
         binding.homeRecyclerView.apply {
-           layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
             adapter = noteAdapterAlternative
         }
 
-        noteViewModelAlternative.getAllNotes().observe(viewLifecycleOwner){ notes ->
+        noteViewModelAlternative.getAllNotes().observe(viewLifecycleOwner) { notes ->
             noteAdapterAlternative.submitList(notes)
             updateTheUI(notes)
         }
     }
 
-    override fun showDetailsOfNote(note: Note) {
-        val direction: NavDirections = HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(note)
-        findNavController().navigate(direction)
-    }
 
     override fun onResume() {
         super.onResume()
@@ -145,13 +145,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return false
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        homeBinding = null
-    }
-
-
 
 
 }

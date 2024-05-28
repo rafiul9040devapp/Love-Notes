@@ -1,6 +1,8 @@
 package com.rafiul.lovenotes.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -17,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import com.rafiul.lovenotes.MainActivity
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentAddNoteBinding
+import com.rafiul.lovenotes.databinding.FragmentHomeBinding
 import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.utils.runWithProgressBar
 import com.rafiul.lovenotes.utils.showToast
@@ -34,19 +37,19 @@ import kotlinx.coroutines.withContext
 @AndroidEntryPoint
 class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
-    private var addNoteBinding: FragmentAddNoteBinding? = null
-    private val binding get() = addNoteBinding!!
+    private lateinit var binding: FragmentAddNoteBinding
 
     private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
-    private lateinit var addNoteView: View
 
-    val inProgress = false
+    private lateinit var saveMenuItem: MenuItem
+    private val inProgress = false
+    private val EXECUTION_TIME: Long = 2500L
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        addNoteBinding = FragmentAddNoteBinding.inflate(inflater, container, false)
+        binding = FragmentAddNoteBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -55,71 +58,50 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
-        addNoteView = view
 
     }
 
-    private fun saveNote(view: View) {
+    private fun saveNote() {
         val noteTitle = binding.addNoteTitle.text.toString().trim()
         val noteDescription = binding.addNoteDesc.text.toString().trim()
+
+        saveMenuItem.isEnabled = false
 
         if (noteTitle.isNotEmpty()) {
             val note = Note(0, noteTitle, noteDescription)
             noteViewModelAlternative.insertNote(note)
+           with(binding){
+               main.toggleVisibility(inProgress)
+               progressOverlay.srcOver.toggleVisibility(!inProgress)
+           }
 
-            addNoteView.context?.showToast(getString(R.string.note_saved))
-
-            findNavController().popBackStack()
-
-           // navigationHandling()
-
-
-//            with(view){
-//                runWithProgressBar(3000){
-//                    findNavController().popBackStack()
-//                }
-//            }
+            Handler(Looper.getMainLooper()).postDelayed({
+                context?.showToast(getString(R.string.note_saved))
+                findNavController().navigate(R.id.action_addNoteFragment_to_homeFragment)
+            },EXECUTION_TIME)
 
         } else {
-            addNoteView.context?.showToast(getString(R.string.please_enter_note_title))
+            context?.showToast(getString(R.string.please_enter_note_title))
+            saveMenuItem.isEnabled = true
         }
     }
 
-    private fun navigationHandling() {
-        CoroutineScope(Dispatchers.IO).launch {
-            delay(1500L)
-            withContext(Dispatchers.Main) {
-                binding.progressBar.toggleVisibility(!inProgress)
-            }
-
-            binding.progressBar.toggleVisibility(inProgress)
-            addNoteView.context?.showToast(getString(R.string.note_saved))
-
-            withContext(Dispatchers.Main) {
-                findNavController().popBackStack()
-            }
-        }
-    }
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menu.clear()
         menuInflater.inflate(R.menu.add_note_menu, menu)
+        saveMenuItem = menu.findItem(R.id.saveMenu)
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.saveMenu -> {
-                saveNote(addNoteView)
+                saveNote()
                 true
             }
-
             else -> false
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        addNoteBinding = null
-    }
-
 }
+
