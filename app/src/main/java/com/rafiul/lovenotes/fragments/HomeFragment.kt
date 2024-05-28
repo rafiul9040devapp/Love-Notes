@@ -22,6 +22,7 @@ import com.rafiul.lovenotes.adapter.NoteAdapterAlternative
 import com.rafiul.lovenotes.databinding.FragmentHomeBinding
 import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.utils.showAlertDialog
+import com.rafiul.lovenotes.utils.showAppBar
 import com.rafiul.lovenotes.utils.toggleVisibility
 import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +49,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        showAppBar()
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 

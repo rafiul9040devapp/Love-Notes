@@ -21,7 +21,9 @@ import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentAddNoteBinding
 import com.rafiul.lovenotes.databinding.FragmentHomeBinding
 import com.rafiul.lovenotes.model.Note
+import com.rafiul.lovenotes.utils.enableHomeAsUp
 import com.rafiul.lovenotes.utils.runWithProgressBar
+import com.rafiul.lovenotes.utils.showAppBar
 import com.rafiul.lovenotes.utils.showToast
 import com.rafiul.lovenotes.utils.toggleVisibility
 import com.rafiul.lovenotes.viewmodel.NoteViewModel
@@ -56,6 +58,8 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        showAppBar()
+
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
@@ -66,6 +70,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
         val noteDescription = binding.addNoteDesc.text.toString().trim()
 
         saveMenuItem.isEnabled = false
+        enableHomeAsUp(false)
 
         if (noteTitle.isNotEmpty()) {
             val note = Note(0, noteTitle, noteDescription)
@@ -83,6 +88,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
         } else {
             context?.showToast(getString(R.string.please_enter_note_title))
             saveMenuItem.isEnabled = true
+            enableHomeAsUp(true)
         }
     }
 

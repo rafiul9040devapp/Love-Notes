@@ -19,7 +19,9 @@ import androidx.navigation.fragment.navArgs
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.databinding.FragmentEditNoteBinding
 import com.rafiul.lovenotes.model.Note
+import com.rafiul.lovenotes.utils.enableHomeAsUp
 import com.rafiul.lovenotes.utils.showAlertDialog
+import com.rafiul.lovenotes.utils.showAppBar
 import com.rafiul.lovenotes.utils.showToast
 import com.rafiul.lovenotes.utils.toggleVisibility
 import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
@@ -51,6 +53,7 @@ class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        showAppBar()
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
@@ -75,6 +78,7 @@ class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
                     val note = Note(currentNote.id, noteTitle, noteDescription)
                     noteViewModelAlternative.updateNote(note)
                     deleteMenuItem.isEnabled = false
+                   enableHomeAsUp(false)
                     navigateToHomeScreen{
                         context?.showToast(getString(R.string.note_is_updated))
                     }
@@ -103,7 +107,7 @@ class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
 
     private fun navigateToHomeScreen(action: () -> Unit) {
         deleteMenuItem.isEnabled = false
-
+        enableHomeAsUp(false)
         with(binding){
             main.toggleVisibility(inProgress)
             progressOverlay.srcOver.toggleVisibility(!inProgress)
