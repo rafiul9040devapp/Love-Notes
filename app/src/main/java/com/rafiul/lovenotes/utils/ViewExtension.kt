@@ -8,8 +8,12 @@ fun View.toggleVisibility(isVisible: Boolean) {
     this.visibility = if (isVisible) View.VISIBLE else View.GONE
 }
 
-fun View.setEnabledState(enabled: Boolean) {
+fun View.setEnabledState(enabled: Boolean= true ) {
     this.isEnabled = enabled
+}
+
+fun View.setDisabledState(disabled: Boolean = false) {
+    this.isEnabled = disabled
 }
 
 
