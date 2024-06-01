@@ -14,6 +14,26 @@ abstract class NoteDatabase : RoomDatabase() {
     abstract fun getNoteDao(): NoteDao
 
 
+    companion object {
+
+        private var instance: NoteDatabase? = null
+        @Synchronized
+        fun getInstance(context: Context): NoteDatabase{
+            return if (instance == null){
+                instance = buildDatabase(context)
+                instance as NoteDatabase
+            }else{
+                instance as NoteDatabase
+            }
+        }
+        private fun buildDatabase(context: Context) = Room.databaseBuilder(
+            context.applicationContext,
+            NoteDatabase::class.java,
+            DATABASE_NAME
+        ).build()
+    }
+
+
 //    companion object{
 //
 //        private var database: NoteDatabase?=null
@@ -51,20 +71,20 @@ abstract class NoteDatabase : RoomDatabase() {
 //        ).build()
 
 
-    companion object {
-        @Volatile
-        private var instance: NoteDatabase? = null
-        private val LOCK = Any()
-
-        operator fun invoke(context: Context): NoteDatabase = instance ?: synchronized(LOCK) {
-            instance ?: buildDatabase(context).also { instance = it }
-        }
-
-        private fun buildDatabase(context: Context) = Room.databaseBuilder(
-            context.applicationContext,
-            NoteDatabase::class.java,
-            DATABASE_NAME
-        ).build()
-    }
+//    companion object {
+//        @Volatile
+//        private var instance: NoteDatabase? = null
+//        private val LOCK = Any()
+//
+//        operator fun invoke(context: Context): NoteDatabase = instance ?: synchronized(LOCK) {
+//            instance ?: buildDatabase(context).also { instance = it }
+//        }
+//
+//        private fun buildDatabase(context: Context) = Room.databaseBuilder(
+//            context.applicationContext,
+//            NoteDatabase::class.java,
+//            DATABASE_NAME
+//        ).build()
+//    }
 }
 

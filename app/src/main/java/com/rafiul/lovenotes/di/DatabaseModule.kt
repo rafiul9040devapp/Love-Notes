@@ -17,7 +17,7 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDatabase(@ApplicationContext context: Context):NoteDatabase = NoteDatabase.invoke(context)
+    fun provideDatabase(@ApplicationContext context: Context):NoteDatabase = NoteDatabase.getInstance(context)
 
 
     @Singleton
