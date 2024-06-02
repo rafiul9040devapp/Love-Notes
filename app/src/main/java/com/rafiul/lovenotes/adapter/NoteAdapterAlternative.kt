@@ -31,14 +31,13 @@ class NoteAdapterAlternative(private var listener: Listener) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolderAlternative {
-        return NoteViewHolderAlternative(
-            NoteLayoutBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-        )
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding = NoteLayoutBinding.inflate(layoutInflater, parent, false)
+        return NoteViewHolderAlternative(binding)
     }
 
-    override fun onBindViewHolder(holder: NoteViewHolderAlternative, position: Int) = holder.bind(getItem(position))
+    override fun onBindViewHolder(holder: NoteViewHolderAlternative, position: Int) =
+        holder.bind(getItem(position))
 
     companion object {
         val COMPARATOR = object : DiffUtil.ItemCallback<Note>() {
