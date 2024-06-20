@@ -1,5 +1,6 @@
 package com.rafiul.lovenotes.fragments
 
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -21,11 +23,13 @@ import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.adapter.NoteAdapterAlternative
 import com.rafiul.lovenotes.databinding.FragmentHomeBinding
 import com.rafiul.lovenotes.model.Note
+import com.rafiul.lovenotes.utils.NotificationHelper
 import com.rafiul.lovenotes.utils.showAlertDialog
 import com.rafiul.lovenotes.utils.showAppBar
 import com.rafiul.lovenotes.utils.toggleVisibility
 import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -36,6 +40,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
     private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
 
     private lateinit var noteAdapterAlternative: NoteAdapterAlternative
+
+    @Inject
+    lateinit var notificationHelper: NotificationHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,7 +65,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
                 findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
             }
         }
-
         settingUpRecyclerView()
     }
 
@@ -107,9 +113,16 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 
 
 
+
     private fun updateTheUI(notes: List<Note>?) {
         notes?.let {
             val hasNotes = it.isNotEmpty()
+            if (!hasNotes){
+                notificationHelper.showNotification(
+                    "There is no notes",
+                    message = "Please make some notes for your loved ones"
+                )
+            }
             with(binding) {
                 emptyNotesImage.toggleVisibility(!hasNotes)
                 homeRecyclerView.toggleVisibility(hasNotes)
