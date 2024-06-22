@@ -27,6 +27,9 @@ interface NoteDao {
     fun getAllNotes(): LiveData<List<Note>>
 
 
+    @Query("SELECT * FROM NOTES")
+    suspend fun observeNoteList(): List<Note>
+
     @Query("SELECT * FROM NOTES WHERE noteTitle LIKE:query OR noteDescription LIKE:query")
     fun searchNotes(query: String?): LiveData<List<Note>>
 

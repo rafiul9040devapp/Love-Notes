@@ -27,6 +27,12 @@ class NoteRepositoryImp @Inject constructor(private val noteDao: NoteDao) : Note
         }
     }
 
+    override suspend fun observeNoteList(): List<Note> {
+        return withContext(Dispatchers.IO) {
+            noteDao.observeNoteList()
+        }
+    }
+
     override fun getAllNotes(): LiveData<List<Note>> = noteDao.getAllNotes()
 
     override fun searchNotes(query: String?): LiveData<List<Note>> = noteDao.searchNotes(query)

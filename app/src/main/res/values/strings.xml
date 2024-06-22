@@ -16,4 +16,6 @@
     <string name="ok">Ok</string>
     <string name="note_is_updated">Note is Updated</string>
     <string name="note_is_deleted">Note is Deleted</string>
+    <string name="there_is_no_love_notes">There is no Love Notes</string>
+    <string name="make_new_notes_for_your_loved_ones">Make new notes for your LOVED ones...</string>
 </resources>

@@ -33,7 +33,8 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextListener, MenuProvider {
+class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextListener,
+    MenuProvider {
 
     private lateinit var binding: FragmentHomeBinding
 
@@ -41,8 +42,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 
     private lateinit var noteAdapterAlternative: NoteAdapterAlternative
 
-    @Inject
-    lateinit var notificationHelper: NotificationHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -112,17 +111,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
     }
 
 
-
-
     private fun updateTheUI(notes: List<Note>?) {
         notes?.let {
             val hasNotes = it.isNotEmpty()
-            if (!hasNotes){
-                notificationHelper.showNotification(
-                    "There is no notes",
-                    message = "Please make some notes for your loved ones"
-                )
-            }
             with(binding) {
                 emptyNotesImage.toggleVisibility(!hasNotes)
                 homeRecyclerView.toggleVisibility(hasNotes)
@@ -133,7 +124,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 
     private fun searchNote(query: String?) {
         val searchQuery = "%$query%"
-        noteViewModelAlternative.searchNote(searchQuery).observe(viewLifecycleOwner) { notes->
+        noteViewModelAlternative.searchNote(searchQuery).observe(viewLifecycleOwner) { notes ->
             noteAdapterAlternative.submitList(notes)
         }
     }

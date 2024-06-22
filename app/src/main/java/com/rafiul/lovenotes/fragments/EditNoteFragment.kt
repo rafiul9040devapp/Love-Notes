@@ -40,7 +40,10 @@ class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
 
     private lateinit var deleteMenuItem: MenuItem
     private val inProgress = false
-    private val EXECUTION_TIME: Long = 2500L
+
+    companion object{
+        private const val EXECUTION_TIME: Long = 2500L
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
