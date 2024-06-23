@@ -1,19 +1,26 @@
 package com.rafiul.lovenotes.adapter
 
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rafiul.lovenotes.databinding.NoteLayoutBinding
 import com.rafiul.lovenotes.model.Note
+import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
+import javax.inject.Inject
 
 class NoteAdapterAlternative(private var listener: Listener) :
     ListAdapter<Note, NoteAdapterAlternative.NoteViewHolderAlternative>(COMPARATOR) {
 
-
     interface Listener {
         fun showDetailsOfNote(note: Note)
+        fun readTheNoteTitle(noteTitle: TextView,fullText: String)
     }
 
     inner class NoteViewHolderAlternative(private val binding: NoteLayoutBinding) :
@@ -22,6 +29,9 @@ class NoteAdapterAlternative(private var listener: Listener) :
             with(binding) {
                 noteTitle.text = note.noteTitle
                 noteDesc.text = note.noteDescription
+                noteTitle.setOnClickListener {
+                    listener.readTheNoteTitle(noteTitle,note.noteTitle)
+                }
             }
 
             itemView.setOnClickListener {

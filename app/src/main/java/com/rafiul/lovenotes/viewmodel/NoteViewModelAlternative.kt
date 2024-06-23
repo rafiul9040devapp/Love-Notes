@@ -7,6 +7,7 @@ import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.repository.NoteRepository
 import com.rafiul.lovenotes.utils.NotificationHelper
+import com.rafiul.lovenotes.utils.TextToSpeechHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -16,7 +17,7 @@ import javax.inject.Inject
 class NoteViewModelAlternative @Inject constructor(
     @ApplicationContext private val context: Context,
     private val noteRepository: NoteRepository,
-    private val notificationHelper: NotificationHelper
+    private val notificationHelper: NotificationHelper,
 ) : ViewModel() {
 
     private var initialLoadCompleted = false
@@ -38,7 +39,6 @@ class NoteViewModelAlternative @Inject constructor(
             initialLoadCompleted = true
         }
     }
-
 
     fun insertNote(note: Note) = viewModelScope.launch {
         noteRepository.insertNote(note)

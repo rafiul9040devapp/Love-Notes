@@ -1,5 +1,6 @@
 package com.rafiul.lovenotes.fragments
 
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,6 +10,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
@@ -24,6 +26,7 @@ import com.rafiul.lovenotes.adapter.NoteAdapterAlternative
 import com.rafiul.lovenotes.databinding.FragmentHomeBinding
 import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.utils.NotificationHelper
+import com.rafiul.lovenotes.utils.TextToSpeechHelper
 import com.rafiul.lovenotes.utils.showAlertDialog
 import com.rafiul.lovenotes.utils.showAppBar
 import com.rafiul.lovenotes.utils.toggleVisibility
@@ -41,6 +44,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
     private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
 
     private lateinit var noteAdapterAlternative: NoteAdapterAlternative
+
+    @Inject
+    lateinit var textToSpeechHelper: TextToSpeechHelper
 
 
     override fun onCreateView(
@@ -73,6 +79,16 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
                 val direction: NavDirections =
                     HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(note)
                 findNavController().navigate(direction)
+            }
+
+            override fun readTheNoteTitle(noteTitle: TextView, fullText: String) {
+                textToSpeechHelper.speak(fullText) { progress ->
+                    if (progress == -1) {
+                        noteTitle.setTextColor(Color.BLACK)
+                    } else {
+                        textToSpeechHelper.updateTextHighlight(noteTitle, fullText, progress)
+                    }
+                }
             }
         })
         binding.homeRecyclerView.apply {
@@ -152,5 +168,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
         return false
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        textToSpeechHelper.release()
+    }
 
 }
