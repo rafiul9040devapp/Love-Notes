@@ -28,7 +28,6 @@ class TextToSpeechHelper @Inject constructor(@ApplicationContext private val con
         initializeTts()
     }
 
-
     private fun initializeTts(onInitCallback: () -> Unit = {}) {
         if (tts == null) {
             tts = TextToSpeech(context) { status ->
@@ -37,7 +36,6 @@ class TextToSpeechHelper @Inject constructor(@ApplicationContext private val con
             }
         }
     }
-
 
     private fun checkTheStatusOfInitialization(status: Int, onInitCallback: () -> Unit) {
         if (status == TextToSpeech.SUCCESS) {
@@ -56,9 +54,10 @@ class TextToSpeechHelper @Inject constructor(@ApplicationContext private val con
 
                     override fun onDone(utteranceId: String?) {
                         Log.i("TTS", "TTS onDone")
-                        onProgress?.invoke(-1)  // -1 to signify the end
+                        onProgress?.invoke(-1)
                     }
 
+                    @Deprecated("Deprecated in Java")
                     override fun onError(utteranceId: String?) {
                         context.showToast("Unable to play the voice message")
                         Log.e("TTS", "TTS onError")
@@ -95,36 +94,6 @@ class TextToSpeechHelper @Inject constructor(@ApplicationContext private val con
         }
         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "UniqueID")
     }
-
-
-    fun updateTextHighlight(textView: TextView, fullText: String, progress: Int) {
-        val spannableString = SpannableString(fullText)
-        val words = fullText.split(" ")
-
-        var charIndex = 0
-        for (word in words) {
-            val endCharIndex = charIndex + word.length
-            if (charIndex <= progress) {
-                spannableString.setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.blur)),
-                    charIndex,
-                    endCharIndex,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            } else {
-                spannableString.setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.red)),
-                    charIndex,
-                    endCharIndex,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-            charIndex += word.length + 1
-        }
-
-        textView.text = spannableString
-    }
-
 
     fun release() {
         tts?.stop()

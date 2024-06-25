@@ -30,6 +30,7 @@ import com.rafiul.lovenotes.utils.showAlertDialog
 import com.rafiul.lovenotes.utils.showAppBar
 import com.rafiul.lovenotes.utils.showToast
 import com.rafiul.lovenotes.utils.toggleVisibility
+import com.rafiul.lovenotes.utils.updateTextHighlight
 import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -84,7 +85,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 
             override fun readTheNoteTitle(noteTitle: TextView, fullText: String) {
                 textToSpeechHelper.speak(fullText) { progress ->
-                    textToSpeechHelper.updateTextHighlight(noteTitle, fullText, progress)
+                    noteTitle.updateTextHighlight(requireContext(), fullText, progress)
                 }
             }
         })
