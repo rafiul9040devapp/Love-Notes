@@ -1,9 +1,6 @@
 package com.rafiul.lovenotes.adapter
 
-import android.graphics.Color
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
@@ -12,11 +9,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.rafiul.lovenotes.databinding.NoteLayoutBinding
 import com.rafiul.lovenotes.model.Note
-import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
-import javax.inject.Inject
+
 
 class NoteAdapterAlternative(private var listener: Listener) :
-    ListAdapter<Note, NoteAdapterAlternative.NoteViewHolderAlternative>(COMPARATOR) {
+    ListAdapter<Note, NoteAdapterAlternative.NoteViewHolderAlternative>(NoteDiffCallBackAlternative()) {
 
     interface Listener {
         fun showDetailsOfNote(note: Note)
@@ -48,17 +44,15 @@ class NoteAdapterAlternative(private var listener: Listener) :
 
     override fun onBindViewHolder(holder: NoteViewHolderAlternative, position: Int) =
         holder.bind(getItem(position))
+}
 
-    companion object {
-        val COMPARATOR = object : DiffUtil.ItemCallback<Note>() {
-            override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
-                return oldItem == newItem
-            }
-
-            override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-        }
+class NoteDiffCallBackAlternative : DiffUtil.ItemCallback<Note>() {
+    override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
+        return oldItem == newItem
     }
+
+    override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+        return oldItem.id == newItem.id
+    }
+
 }

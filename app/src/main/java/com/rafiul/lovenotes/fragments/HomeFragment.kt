@@ -1,9 +1,8 @@
 package com.rafiul.lovenotes.fragments
 
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.speech.tts.TextToSpeech
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -12,10 +11,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavDirections
@@ -25,13 +25,14 @@ import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.adapter.NoteAdapterAlternative
 import com.rafiul.lovenotes.databinding.FragmentHomeBinding
 import com.rafiul.lovenotes.model.Note
-import com.rafiul.lovenotes.utils.NotificationHelper
 import com.rafiul.lovenotes.utils.TextToSpeechHelper
 import com.rafiul.lovenotes.utils.showAlertDialog
 import com.rafiul.lovenotes.utils.showAppBar
+import com.rafiul.lovenotes.utils.showToast
 import com.rafiul.lovenotes.utils.toggleVisibility
 import com.rafiul.lovenotes.viewmodel.NoteViewModelAlternative
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -83,11 +84,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 
             override fun readTheNoteTitle(noteTitle: TextView, fullText: String) {
                 textToSpeechHelper.speak(fullText) { progress ->
-                    if (progress == -1) {
-                        noteTitle.setTextColor(Color.BLACK)
-                    } else {
-                        textToSpeechHelper.updateTextHighlight(noteTitle, fullText, progress)
-                    }
+                    textToSpeechHelper.updateTextHighlight(noteTitle, fullText, progress)
                 }
             }
         })

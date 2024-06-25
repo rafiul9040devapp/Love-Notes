@@ -10,6 +10,8 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.rafiul.lovenotes.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Locale
 import javax.inject.Inject
@@ -23,15 +25,19 @@ class TextToSpeechHelper @Inject constructor(@ApplicationContext private val con
     private var onProgress: ((Int) -> Unit)? = null
 
     init {
-        initializeTts {}
+        initializeTts()
     }
 
-    private fun initializeTts(onInitCallback: () -> Unit) {
-        tts = TextToSpeech(context,TextToSpeech.OnInitListener { status->
-            context.showToast(status.toString())
-            checkTheStatusOfInitialization(status, onInitCallback)
-        },null )
+
+    private fun initializeTts(onInitCallback: () -> Unit = {}) {
+        if (tts == null) {
+            tts = TextToSpeech(context) { status ->
+                context.showToast("TTS status: $status")
+                checkTheStatusOfInitialization(status, onInitCallback)
+            }
+        }
     }
+
 
     private fun checkTheStatusOfInitialization(status: Int, onInitCallback: () -> Unit) {
         if (status == TextToSpeech.SUCCESS) {
@@ -58,12 +64,7 @@ class TextToSpeechHelper @Inject constructor(@ApplicationContext private val con
                         Log.e("TTS", "TTS onError")
                     }
 
-                    override fun onRangeStart(
-                        utteranceId: String?,
-                        start: Int,
-                        end: Int,
-                        frame: Int
-                    ) {
+                    override fun onRangeStart(utteranceId: String?, start: Int, end: Int, frame: Int) {
                         Log.i("TTS", "TTS onRangeStart: $start - $end")
                         onProgress?.invoke(end)
                     }
@@ -76,6 +77,7 @@ class TextToSpeechHelper @Inject constructor(@ApplicationContext private val con
         }
     }
 
+
     fun speak(text: String, onProgressCallback: (Int) -> Unit) {
         when {
             isTtsInitialized -> speakUpText(onProgressCallback, text)
@@ -85,23 +87,44 @@ class TextToSpeechHelper @Inject constructor(@ApplicationContext private val con
         }
     }
 
+
     private fun speakUpText(onProgressCallback: (Int) -> Unit, text: String) {
         onProgress = onProgressCallback
-        val params = Bundle()
-        params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID")
+        val params = Bundle().apply {
+            putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID")
+        }
         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "UniqueID")
     }
 
+
     fun updateTextHighlight(textView: TextView, fullText: String, progress: Int) {
         val spannableString = SpannableString(fullText)
-        spannableString.setSpan(
-            ForegroundColorSpan(Color.RED),
-            0,
-            progress,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        val words = fullText.split(" ")
+
+        var charIndex = 0
+        for (word in words) {
+            val endCharIndex = charIndex + word.length
+            if (charIndex <= progress) {
+                spannableString.setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.blur)),
+                    charIndex,
+                    endCharIndex,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            } else {
+                spannableString.setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.red)),
+                    charIndex,
+                    endCharIndex,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            charIndex += word.length + 1
+        }
+
         textView.text = spannableString
     }
+
 
     fun release() {
         tts?.stop()

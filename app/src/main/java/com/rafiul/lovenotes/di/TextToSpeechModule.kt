@@ -12,8 +12,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object TextToSpeechModule {
-
     @Singleton
     @Provides
-    fun provideTextToSpeechHelper(@ApplicationContext context: Context) = TextToSpeechHelper(context)
+    fun provideTextToSpeechHelper(@ApplicationContext context: Context) : TextToSpeechHelper {
+        return TextToSpeechHelper(context)
+    }
 }
