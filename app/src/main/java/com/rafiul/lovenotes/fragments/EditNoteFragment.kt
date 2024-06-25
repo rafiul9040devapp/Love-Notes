@@ -3,13 +3,10 @@ package com.rafiul.lovenotes.fragments
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
@@ -17,6 +14,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.rafiul.lovenotes.R
+import com.rafiul.lovenotes.base.BaseFragment
 import com.rafiul.lovenotes.databinding.FragmentEditNoteBinding
 import com.rafiul.lovenotes.model.Note
 import com.rafiul.lovenotes.utils.enableHomeAsUp
@@ -29,9 +27,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
-
-    private lateinit var binding: FragmentEditNoteBinding
+class EditNoteFragment: BaseFragment<FragmentEditNoteBinding>(FragmentEditNoteBinding::class), MenuProvider {
 
     private val noteViewModelAlternative by viewModels<NoteViewModelAlternative>()
 
@@ -42,15 +38,7 @@ class EditNoteFragment: Fragment(R.layout.fragment_edit_note), MenuProvider {
     private val inProgress = false
 
     companion object{
-        private const val EXECUTION_TIME: Long = 2500L
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentEditNoteBinding.inflate(inflater, container, false)
-        return binding.root
+        private const val EXECUTION_TIME: Long = 2000L
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
