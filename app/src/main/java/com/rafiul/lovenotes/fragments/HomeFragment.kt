@@ -93,11 +93,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::clas
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
             adapter = noteAdapterWithBase
-//            adapter = noteAdapterAlternative
         }
 
         noteViewModelAlternative.getAllNotes().observe(viewLifecycleOwner) { notes ->
-//            noteAdapterAlternative.submitList(notes)
             noteAdapterWithBase.submitList(notes)
             updateTheUI(notes)
         }
@@ -141,7 +139,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::clas
     private fun searchNote(query: String?) {
         val searchQuery = "%$query%"
         noteViewModelAlternative.searchNote(searchQuery).observe(viewLifecycleOwner) { notes ->
-//            noteAdapterAlternative.submitList(notes)
             noteAdapterWithBase.submitList(notes)
         }
     }
