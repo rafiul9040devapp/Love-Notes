@@ -17,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.rafiul.lovenotes.R
 import com.rafiul.lovenotes.adapter.NoteAdapterAlternative
+import com.rafiul.lovenotes.adapter.NoteAdapterWithBase
 import com.rafiul.lovenotes.base.BaseFragment
 import com.rafiul.lovenotes.databinding.FragmentHomeBinding
 import com.rafiul.lovenotes.model.Note
@@ -38,6 +39,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::clas
 
     private lateinit var noteAdapterAlternative: NoteAdapterAlternative
 
+    private lateinit var noteAdapterWithBase: NoteAdapterWithBase
+
     @Inject
     lateinit var textToSpeechHelper: TextToSpeechHelper
 
@@ -57,7 +60,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::clas
     }
 
     private fun settingUpRecyclerView() {
-        noteAdapterAlternative = NoteAdapterAlternative(object : NoteAdapterAlternative.Listener {
+//        noteAdapterAlternative = NoteAdapterAlternative(object : NoteAdapterAlternative.Listener {
+//            override fun showDetailsOfNote(note: Note) {
+//                val direction: NavDirections =
+//                    HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(note)
+//                findNavController().navigate(direction)
+//            }
+//
+//            override fun readTheNoteTitle(noteTitle: TextView, fullText: String) {
+//                textToSpeechHelper.speak(fullText) { progress ->
+//                    noteTitle.updateTextHighlight(requireContext(), fullText, progress)
+//                }
+//            }
+//        })
+
+
+        noteAdapterWithBase = NoteAdapterWithBase(object: NoteAdapterWithBase.NoteActionListenerWithBase{
             override fun showDetailsOfNote(note: Note) {
                 val direction: NavDirections =
                     HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(note)
@@ -69,15 +87,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::clas
                     noteTitle.updateTextHighlight(requireContext(), fullText, progress)
                 }
             }
-        })
+
+        } )
         binding.homeRecyclerView.apply {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
-            adapter = noteAdapterAlternative
+            adapter = noteAdapterWithBase
+//            adapter = noteAdapterAlternative
         }
 
         noteViewModelAlternative.getAllNotes().observe(viewLifecycleOwner) { notes ->
-            noteAdapterAlternative.submitList(notes)
+//            noteAdapterAlternative.submitList(notes)
+            noteAdapterWithBase.submitList(notes)
             updateTheUI(notes)
         }
     }
@@ -120,7 +141,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::clas
     private fun searchNote(query: String?) {
         val searchQuery = "%$query%"
         noteViewModelAlternative.searchNote(searchQuery).observe(viewLifecycleOwner) { notes ->
-            noteAdapterAlternative.submitList(notes)
+//            noteAdapterAlternative.submitList(notes)
+            noteAdapterWithBase.submitList(notes)
         }
     }
 
